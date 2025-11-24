@@ -1,0 +1,5 @@
+{
+  "name": "THK",
+  "description": "A comprehensive E-Learning management dashboard featuring CRUD operations for Students, Courses, Mentors, and Administration.",
+  "requestFramePermissions": []
+}
