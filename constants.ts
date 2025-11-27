@@ -9,9 +9,48 @@ export const MOCK_STUDENTS: Student[] = [
 ];
 
 export const MOCK_MENTORS: Mentor[] = [
-  { id: '1', name: 'Dr. Sarah Connor', email: 'sarah@thk.edu', expertise: ['AI', 'Machine Learning'], rating: 4.9, totalStudents: 1200, status: UserStatus.Active, avatar: 'https://picsum.photos/id/64/100/100' },
-  { id: '2', name: 'Prof. Alan Grant', email: 'alan@thk.edu', expertise: ['Paleontology', 'Biology'], rating: 4.7, totalStudents: 850, status: UserStatus.Active, avatar: 'https://picsum.photos/id/65/100/100' },
-  { id: '3', name: 'Maya Angelou', email: 'maya@thk.edu', expertise: ['Literature', 'Creative Writing'], rating: 5.0, totalStudents: 2000, status: UserStatus.Inactive, avatar: 'https://picsum.photos/id/66/100/100' },
+  { 
+    id: '1', 
+    name: 'Dr. Sarah Connor', 
+    email: 'sarah@thk.edu', 
+    expertise: ['AI', 'Machine Learning', 'Python'], 
+    rating: 4.9, 
+    totalStudents: 1200, 
+    status: UserStatus.Active, 
+    avatar: 'https://picsum.photos/id/64/100/100',
+    title: 'Lead AI Research Scientist',
+    company: 'Skynet Labs',
+    bio: 'Dr. Connor has over 15 years of experience in Artificial Intelligence and Neural Networks. She holds a Ph.D. from MIT and has published over 30 papers in top-tier journals. Her teaching style focuses on demystifying complex algorithms and applying them to real-world problems.',
+    certificates: ['Ph.D. Computer Science', 'Google AI Fellow', 'Turing Award Nominee']
+  },
+  { 
+    id: '2', 
+    name: 'Prof. Alan Grant', 
+    email: 'alan@thk.edu', 
+    expertise: ['Paleontology', 'Biology', 'History'], 
+    rating: 4.7, 
+    totalStudents: 850, 
+    status: UserStatus.Active, 
+    avatar: 'https://picsum.photos/id/65/100/100',
+    title: 'Senior Paleontologist',
+    company: 'InGen Corp',
+    bio: 'Prof. Grant is a world-renowned expert in evolutionary biology and paleontology. He specializes in the study of prehistoric ecosystems and has led numerous excavations in Montana. His courses bring history to life through immersive storytelling and scientific rigor.',
+    certificates: ['Ph.D. Paleontology', 'National Science Foundation Grantee', 'Author of "Dinosaur Detectives"']
+  },
+  { 
+    id: '3', 
+    name: 'Maya Angelou', 
+    email: 'maya@thk.edu', 
+    expertise: ['Literature', 'Creative Writing', 'Poetry'], 
+    rating: 5.0, 
+    totalStudents: 2000, 
+    status: UserStatus.Inactive, 
+    avatar: 'https://picsum.photos/id/66/100/100',
+    title: 'Distinguished Professor of Arts',
+    company: 'Global Arts Foundation',
+    bio: 'Maya is a celebrated poet, memoirist, and civil rights activist. With over 50 honorary degrees, she brings a lifetime of wisdom and lyrical mastery to her students. Her classes explore the power of voice, identity, and narrative structure.',
+    certificates: ['Presidential Medal of Freedom', 'Pulitzer Prize Nominee', 'Grammy Award Winner']
+  },
 ];
 
 export const MOCK_COURSES: Course[] = [

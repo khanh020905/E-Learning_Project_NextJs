@@ -27,6 +27,11 @@ export interface Mentor {
   totalStudents: number;
   status: UserStatus;
   avatar: string;
+  // Extended Profile Fields
+  title?: string;
+  bio?: string;
+  certificates?: string[];
+  company?: string;
 }
 
 export interface Course {
@@ -91,6 +96,7 @@ export type ViewState =
   | 'my-courses'     
   | 'apply-to-teach'
   | 'blog'
-  | 'course-details'; // New Full Page View
+  | 'course-details'
+  | 'mentor-details'; // New Full Page View
 
 export type Language = 'en' | 'vi';

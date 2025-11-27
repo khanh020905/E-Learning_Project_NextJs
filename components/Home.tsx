@@ -1,10 +1,11 @@
 
+
 "use client";
 
 import React, { useState } from 'react';
 import { Play, Star, Clock, ArrowRight, Sparkles, Globe, Mail, Phone, Users, Award, Briefcase } from 'lucide-react';
 import { MOCK_COURSES, MOCK_MENTORS } from '../constants';
-import { Course, Language } from '../types';
+import { Course, Language, Mentor } from '../types';
 import { TRANSLATIONS } from '../translations';
 import { useRouter } from './RouterMock';
 
@@ -13,9 +14,10 @@ interface HomeProps {
   onEnroll?: (courseId: string) => void;
   enrolledCourseIds?: string[];
   onViewCourse: (course: Course) => void;
+  onViewMentor?: (mentor: Mentor) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = [], onViewCourse }) => {
+const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = [], onViewCourse, onViewMentor }) => {
   const router = useRouter();
   const t = TRANSLATIONS[lang].home;
   const featuredCourses = MOCK_COURSES.slice(0, 3);
@@ -139,7 +141,11 @@ const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = 
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
              {featuredMentors.map((mentor) => (
-                <div key={mentor.id} className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700 transition-all hover:shadow-lg group text-center">
+                <div 
+                  key={mentor.id} 
+                  onClick={() => onViewMentor && onViewMentor(mentor)}
+                  className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700 transition-all hover:shadow-lg group text-center cursor-pointer transform hover:-translate-y-1"
+                >
                    <div className="w-24 h-24 mx-auto mb-4 relative">
                       <div className="w-full h-full rounded-full overflow-hidden ring-4 ring-slate-50 dark:ring-slate-700 group-hover:ring-indigo-100 dark:group-hover:ring-indigo-900 transition-all">
                          <img src={mentor.avatar} alt={mentor.name} className="w-full h-full object-cover" />
@@ -147,8 +153,8 @@ const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = 
                       <div className="absolute bottom-0 right-0 bg-green-500 w-6 h-6 rounded-full border-4 border-white dark:border-slate-800" title="Available for mentoring"></div>
                    </div>
                    
-                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{mentor.name}</h3>
-                   <p className="text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-4">{mentor.expertise[0]} Specialist</p>
+                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1 group-hover:text-indigo-600 transition-colors">{mentor.name}</h3>
+                   <p className="text-indigo-600 dark:text-indigo-400 text-sm font-medium mb-4">{mentor.title || `${mentor.expertise[0]} Specialist`}</p>
                    
                    <div className="flex flex-wrap justify-center gap-2 mb-6">
                       {mentor.expertise.slice(0, 3).map((skill, idx) => (

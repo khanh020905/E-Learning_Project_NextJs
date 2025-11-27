@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
@@ -18,7 +19,8 @@ const PATH_MAP: Record<string, ViewState> = {
   '/my-courses': 'my-courses',
   '/apply-to-teach': 'apply-to-teach',
   '/blog': 'blog',
-  '/course-details': 'course-details', // New Route
+  '/course-details': 'course-details',
+  '/mentor-details': 'mentor-details', // New Route
 };
 
 // Reverse map for usePathname

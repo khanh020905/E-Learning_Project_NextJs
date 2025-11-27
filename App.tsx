@@ -16,7 +16,8 @@ import ExploreCoursesView from './components/ExploreCoursesView';
 import BlogView from './components/BlogView';
 import Auth from './components/Auth';
 import ChatBot from './components/ChatBot';
-import CourseFullView from './components/CourseFullView'; // Import new Full View
+import CourseFullView from './components/CourseFullView'; 
+import MentorDetailsView from './components/MentorDetailsView'; // New Import
 import { Language, Role, Course, Student, Mentor } from './types';
 import { MOCK_COURSES, MOCK_STUDENTS, MOCK_MENTORS } from './constants'; 
 import { Bell, Search, Menu, Book, User, Settings, Moon, Sun, LogOut, Globe, Repeat, GraduationCap, Users } from 'lucide-react';
@@ -37,8 +38,10 @@ const Layout: React.FC<{
   onEnroll: (id: string) => void;
   selectedCourse: Course | null;
   onViewCourse: (course: Course) => void;
+  selectedMentor: Mentor | null;
+  onViewMentor: (mentor: Mentor) => void;
 }> = ({ 
-  isAuthenticated, onLogout, user, onUpdateUser, lang, setLang, isDarkMode, setIsDarkMode, enrolledCourseIds, onEnroll, selectedCourse, onViewCourse
+  isAuthenticated, onLogout, user, onUpdateUser, lang, setLang, isDarkMode, setIsDarkMode, enrolledCourseIds, onEnroll, selectedCourse, onViewCourse, selectedMentor, onViewMentor
 }) => {
   const router = useRouter();
   const currentView = useCurrentView();
@@ -102,17 +105,17 @@ const Layout: React.FC<{
       }
     });
 
-    // Search Students & Mentors (Admin Only)
+    // Search Students & Mentors (Available to everyone now that mentors are public)
+    MOCK_MENTORS.forEach(mentor => {
+        if (mentor.name.toLowerCase().includes(lowerQuery)) {
+          results.push({ type: 'Mentor', data: mentor });
+        }
+    });
+
     if (user.role === 'Admin') {
       MOCK_STUDENTS.forEach(student => {
         if (student.name.toLowerCase().includes(lowerQuery) || student.email.toLowerCase().includes(lowerQuery)) {
           results.push({ type: 'Student', data: student });
-        }
-      });
-
-      MOCK_MENTORS.forEach(mentor => {
-        if (mentor.name.toLowerCase().includes(lowerQuery)) {
-          results.push({ type: 'Mentor', data: mentor });
         }
       });
     }
@@ -125,11 +128,11 @@ const Layout: React.FC<{
     setIsSearchFocused(false);
 
     if (result.type === 'Course') {
-      onViewCourse(result.data); // Navigate to Full Page Course View
+      onViewCourse(result.data); 
     } else if (result.type === 'Student') {
       router.push('/students');
     } else if (result.type === 'Mentor') {
-      router.push('/mentors');
+      onViewMentor(result.data); // Go to new Mentor Details page
     }
   };
 
@@ -168,6 +171,7 @@ const Layout: React.FC<{
           onEnroll={onEnroll}
           enrolledCourseIds={enrolledCourseIds}
           onViewCourse={onViewCourse}
+          onViewMentor={onViewMentor}
         />;
       case 'dashboard':
         return user.role === 'Admin' ? <Dashboard lang={lang} /> : <div className="p-20 text-center text-slate-500">Access Denied: Admin Only</div>;
@@ -175,6 +179,8 @@ const Layout: React.FC<{
         return <ExploreCoursesView onEnroll={onEnroll} enrolledCourseIds={enrolledCourseIds} onViewCourse={onViewCourse} />;
       case 'course-details':
         return <CourseFullView course={selectedCourse} onEnroll={onEnroll} isEnrolled={selectedCourse ? enrolledCourseIds.includes(selectedCourse.id) : false} />;
+      case 'mentor-details':
+        return <MentorDetailsView mentor={selectedMentor} onViewCourse={onViewCourse} />;
       case 'students':
         return user.role === 'Admin' ? <StudentManager /> : <div className="p-20 text-center text-slate-500">Access Denied: Admin Only</div>;
       case 'courses':
@@ -486,6 +492,7 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null); // New state
 
   const handleLogin = (userData: any) => {
     setUser(userData);
@@ -523,6 +530,8 @@ const App: React.FC = () => {
           onEnroll={handleEnroll}
           selectedCourse={selectedCourse}
           setSelectedCourse={setSelectedCourse}
+          selectedMentor={selectedMentor}
+          setSelectedMentor={setSelectedMentor}
         />
       ) : (
         <Auth onLogin={handleLogin} />
@@ -540,7 +549,12 @@ const LayoutWrapper: React.FC<any> = (props) => {
     router.push('/course-details');
   };
 
-  return <Layout {...props} onViewCourse={handleViewCourse} />;
+  const handleViewMentor = (mentor: Mentor) => {
+    props.setSelectedMentor(mentor);
+    router.push('/mentor-details');
+  }
+
+  return <Layout {...props} onViewCourse={handleViewCourse} onViewMentor={handleViewMentor} />;
 };
 
 export default App;

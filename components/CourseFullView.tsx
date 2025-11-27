@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Play, Star, Clock, FileText, CheckCircle, Share2, Bookmark, 
-  ArrowLeft, Users, Globe, Award, Lock, ChevronDown, ChevronUp 
+  ArrowLeft, Users, Globe, Award, Lock, ChevronDown, ChevronUp, MessageSquare, Send, ThumbsUp
 } from 'lucide-react';
 import { Course } from '../types';
 import { useRouter } from './RouterMock';
@@ -13,10 +13,44 @@ interface CourseFullViewProps {
   isEnrolled: boolean;
 }
 
+interface Review {
+  id: string;
+  name: string;
+  avatar: string;
+  rating: number;
+  date: string;
+  comment: string;
+}
+
 const CourseFullView: React.FC<CourseFullViewProps> = ({ course, onEnroll, isEnrolled }) => {
   const router = useRouter();
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<number | null>(0);
+  
+  // Rating & Review State
+  const [userRating, setUserRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [comment, setComment] = useState('');
+  const [isRated, setIsRated] = useState(false);
+  
+  const [reviews, setReviews] = useState<Review[]>([
+    { 
+      id: '1', 
+      name: 'Michael Chen', 
+      avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=random', 
+      rating: 5, 
+      date: '2 days ago', 
+      comment: 'This course was absolutely amazing! The instructor explained everything clearly and the projects were very practical.' 
+    },
+    { 
+      id: '2', 
+      name: 'Sarah Wilson', 
+      avatar: 'https://ui-avatars.com/api/?name=Sarah+Wilson&background=random', 
+      rating: 4, 
+      date: '1 week ago', 
+      comment: 'Great content, but I wish there were more practice exercises in the second module. Still highly recommended!' 
+    }
+  ]);
 
   if (!course) {
     return (
@@ -80,6 +114,24 @@ const CourseFullView: React.FC<CourseFullViewProps> = ({ course, onEnroll, isEnr
 
   const toggleSection = (idx: number) => {
     setExpandedSection(expandedSection === idx ? null : idx);
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (userRating === 0 || !comment.trim()) return;
+
+    const newReview: Review = {
+      id: Date.now().toString(),
+      name: 'You',
+      avatar: 'https://ui-avatars.com/api/?name=You&background=random',
+      rating: userRating,
+      date: 'Just now',
+      comment: comment
+    };
+
+    setReviews([newReview, ...reviews]);
+    setIsRated(true);
+    setComment('');
   };
 
   return (
@@ -225,6 +277,96 @@ const CourseFullView: React.FC<CourseFullViewProps> = ({ course, onEnroll, isEnr
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Student Feedback Section */}
+          <div>
+             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Student Feedback</h2>
+             
+             {/* Review Form */}
+             <div className="bg-indigo-50 dark:bg-slate-800/50 border border-indigo-100 dark:border-slate-700 p-6 sm:p-8 rounded-2xl mb-8">
+               {!isRated ? (
+                 <form onSubmit={handleSubmitReview} className="space-y-4">
+                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Write a Review</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">How would you rate your experience?</p>
+                      </div>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => setUserRating(star)}
+                            className="transition-transform hover:scale-110 focus:outline-none"
+                          >
+                            <Star 
+                              className={`w-8 h-8 ${
+                                star <= (hoverRating || userRating) 
+                                  ? 'fill-amber-400 text-amber-400' 
+                                  : 'text-slate-300 dark:text-slate-600'
+                              }`} 
+                            />
+                          </button>
+                        ))}
+                      </div>
+                   </div>
+                   
+                   <div>
+                     <textarea
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder="Tell us what you liked or what could be improved..."
+                        className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white min-h-[100px]"
+                        required
+                     />
+                   </div>
+                   
+                   <div className="flex justify-end">
+                      <button 
+                        type="submit"
+                        disabled={userRating === 0 || !comment.trim()}
+                        className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                         <Send className="w-4 h-4" /> Submit Review
+                      </button>
+                   </div>
+                 </form>
+               ) : (
+                 <div className="text-center py-6 animate-in fade-in zoom-in">
+                    <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                       <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Thank you for your review!</h3>
+                    <p className="text-slate-500 dark:text-slate-400">Your feedback helps us improve the learning experience.</p>
+                 </div>
+               )}
+             </div>
+
+             {/* Reviews List */}
+             <div className="space-y-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 animate-in slide-in-from-bottom-2">
+                     <div className="flex items-start gap-4">
+                        <img src={review.avatar} alt={review.name} className="w-12 h-12 rounded-full object-cover" />
+                        <div className="flex-1">
+                           <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-bold text-slate-900 dark:text-white">{review.name}</h4>
+                              <span className="text-xs text-slate-500 dark:text-slate-400">{review.date}</span>
+                           </div>
+                           <div className="flex items-center gap-1 mb-3">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                 <Star key={star} className={`w-4 h-4 ${star <= review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200 dark:text-slate-700'}`} />
+                              ))}
+                           </div>
+                           <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{review.comment}</p>
+                        </div>
+                     </div>
+                  </div>
+                ))}
+             </div>
           </div>
         </div>
 
