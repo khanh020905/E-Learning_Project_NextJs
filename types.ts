@@ -83,13 +83,14 @@ export type ViewState =
   | 'dashboard' 
   | 'students' 
   | 'courses' 
-  | 'explore'      // New Explore/Catalog View
+  | 'explore'      
   | 'mentors' 
   | 'admin'
   | 'user-profile'   
   | 'user-settings'  
   | 'my-courses'     
   | 'apply-to-teach'
-  | 'blog'; // New Blog View
+  | 'blog'
+  | 'course-details'; // New Full Page View
 
 export type Language = 'en' | 'vi';

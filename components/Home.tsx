@@ -4,7 +4,6 @@
 import React, { useState } from 'react';
 import { Play, Star, Clock, ArrowRight, Sparkles, Globe, Mail, Phone, Users, Award, Briefcase } from 'lucide-react';
 import { MOCK_COURSES, MOCK_MENTORS } from '../constants';
-import CourseDetails from './CourseDetails';
 import { Course, Language } from '../types';
 import { TRANSLATIONS } from '../translations';
 import { useRouter } from './RouterMock';
@@ -13,14 +12,14 @@ interface HomeProps {
   lang?: Language;
   onEnroll?: (courseId: string) => void;
   enrolledCourseIds?: string[];
+  onViewCourse: (course: Course) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = [] }) => {
+const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = [], onViewCourse }) => {
   const router = useRouter();
   const t = TRANSLATIONS[lang].home;
   const featuredCourses = MOCK_COURSES.slice(0, 3);
   const featuredMentors = MOCK_MENTORS.slice(0, 3);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   const handleApplyClick = () => {
     router.push('/apply-to-teach');
@@ -80,7 +79,7 @@ const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = 
             {featuredCourses.map((course) => (
               <div 
                 key={course.id} 
-                onClick={() => setSelectedCourse(course)}
+                onClick={() => onViewCourse(course)}
                 className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 overflow-hidden hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group flex flex-col cursor-pointer"
               >
                 <div className="h-56 overflow-hidden relative">
@@ -279,17 +278,6 @@ const Home: React.FC<HomeProps> = ({ lang = 'en', onEnroll, enrolledCourseIds = 
           </div>
         </div>
       </footer>
-
-      {/* Course Details Modal */}
-      {selectedCourse && (
-        <CourseDetails 
-          course={selectedCourse} 
-          isOpen={!!selectedCourse} 
-          onClose={() => setSelectedCourse(null)} 
-          onEnroll={(id) => onEnroll && onEnroll(id)}
-          isEnrolled={enrolledCourseIds.includes(selectedCourse.id)}
-        />
-      )}
     </div>
   );
 };

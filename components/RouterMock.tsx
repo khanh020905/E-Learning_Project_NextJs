@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
@@ -11,14 +10,15 @@ const PATH_MAP: Record<string, ViewState> = {
   '/dashboard': 'dashboard',
   '/students': 'students',
   '/courses': 'courses',
-  '/explore': 'explore', 
+  '/explore': 'explore',
   '/mentors': 'mentors',
   '/admin': 'admin',
   '/profile': 'user-profile',
   '/settings': 'user-settings',
   '/my-courses': 'my-courses',
   '/apply-to-teach': 'apply-to-teach',
-  '/blog': 'blog', // New Route
+  '/blog': 'blog',
+  '/course-details': 'course-details', // New Route
 };
 
 // Reverse map for usePathname
@@ -42,7 +42,6 @@ export const RouterProvider: React.FC<{ children: ReactNode; initialView?: ViewS
     const view = PATH_MAP[href];
     if (view) {
       setCurrentView(view);
-      // Optional: Update browser URL hash for visual feedback (simulated)
       window.location.hash = href; 
     } else {
       console.warn(`No route found for: ${href}`);
@@ -58,7 +57,6 @@ export const RouterProvider: React.FC<{ children: ReactNode; initialView?: ViewS
   );
 };
 
-// Mimic next/navigation hooks
 export const useRouter = () => {
   const context = useContext(RouterContext);
   if (!context) {
@@ -75,7 +73,6 @@ export const usePathname = () => {
   return context.pathname;
 };
 
-// Helper for App.tsx to render content based on route
 export const useCurrentView = () => {
   const context = useContext(RouterContext);
   if (!context) {

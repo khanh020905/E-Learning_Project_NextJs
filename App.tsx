@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -17,9 +16,9 @@ import ExploreCoursesView from './components/ExploreCoursesView';
 import BlogView from './components/BlogView';
 import Auth from './components/Auth';
 import ChatBot from './components/ChatBot';
-import CourseDetails from './components/CourseDetails'; // Added for global search
+import CourseFullView from './components/CourseFullView'; // Import new Full View
 import { Language, Role, Course, Student, Mentor } from './types';
-import { MOCK_COURSES, MOCK_STUDENTS, MOCK_MENTORS } from './constants'; // Added mock data
+import { MOCK_COURSES, MOCK_STUDENTS, MOCK_MENTORS } from './constants'; 
 import { Bell, Search, Menu, Book, User, Settings, Moon, Sun, LogOut, Globe, Repeat, GraduationCap, Users } from 'lucide-react';
 import { TRANSLATIONS } from './translations';
 import { RouterProvider, useRouter, useCurrentView, usePathname } from './components/RouterMock';
@@ -36,8 +35,10 @@ const Layout: React.FC<{
   setIsDarkMode: (v: boolean) => void;
   enrolledCourseIds: string[];
   onEnroll: (id: string) => void;
+  selectedCourse: Course | null;
+  onViewCourse: (course: Course) => void;
 }> = ({ 
-  isAuthenticated, onLogout, user, onUpdateUser, lang, setLang, isDarkMode, setIsDarkMode, enrolledCourseIds, onEnroll
+  isAuthenticated, onLogout, user, onUpdateUser, lang, setLang, isDarkMode, setIsDarkMode, enrolledCourseIds, onEnroll, selectedCourse, onViewCourse
 }) => {
   const router = useRouter();
   const currentView = useCurrentView();
@@ -51,7 +52,6 @@ const Layout: React.FC<{
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<{type: 'Course' | 'Student' | 'Mentor', data: any}[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [globalCourse, setGlobalCourse] = useState<Course | null>(null);
   
   // Refs for click outside
   const notificationWrapperRef = useRef<HTMLDivElement>(null);
@@ -125,7 +125,7 @@ const Layout: React.FC<{
     setIsSearchFocused(false);
 
     if (result.type === 'Course') {
-      setGlobalCourse(result.data); // Open Modal
+      onViewCourse(result.data); // Navigate to Full Page Course View
     } else if (result.type === 'Student') {
       router.push('/students');
     } else if (result.type === 'Mentor') {
@@ -167,11 +167,14 @@ const Layout: React.FC<{
           lang={lang} 
           onEnroll={onEnroll}
           enrolledCourseIds={enrolledCourseIds}
+          onViewCourse={onViewCourse}
         />;
       case 'dashboard':
         return user.role === 'Admin' ? <Dashboard lang={lang} /> : <div className="p-20 text-center text-slate-500">Access Denied: Admin Only</div>;
       case 'explore':
-        return <ExploreCoursesView onEnroll={onEnroll} enrolledCourseIds={enrolledCourseIds} />;
+        return <ExploreCoursesView onEnroll={onEnroll} enrolledCourseIds={enrolledCourseIds} onViewCourse={onViewCourse} />;
+      case 'course-details':
+        return <CourseFullView course={selectedCourse} onEnroll={onEnroll} isEnrolled={selectedCourse ? enrolledCourseIds.includes(selectedCourse.id) : false} />;
       case 'students':
         return user.role === 'Admin' ? <StudentManager /> : <div className="p-20 text-center text-slate-500">Access Denied: Admin Only</div>;
       case 'courses':
@@ -205,8 +208,8 @@ const Layout: React.FC<{
       />
 
       <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-6">
+        {/* Header - Increased padding for bigger size */}
+        <header className="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-8">
           <div className="flex items-center justify-between max-w-7xl mx-auto relative">
             {/* Left Section: Menu & Logo */}
             <div className="flex items-center gap-4 md:gap-6 shrink-0 z-10">
@@ -214,15 +217,15 @@ const Layout: React.FC<{
                 onClick={() => setIsSidebarOpen(true)}
                 className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
               >
-                <Menu className="w-7 h-7 text-slate-600 dark:text-slate-300" />
+                <Menu className="w-8 h-8 text-slate-600 dark:text-slate-300" />
               </button>
               
-              {/* Clickable Logo Home Link */}
+              {/* Clickable Logo Home Link - Increased Size */}
               <div 
                 className="flex items-center gap-3 cursor-pointer group" 
                 onClick={() => router.push('/')}
               >
-                 <div className="w-10 h-10 relative">
+                 <div className="w-12 h-12 relative">
                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md group-hover:scale-105 transition-transform">
                       <path d="M50 98C20 82 10 55 10 30V12L50 2L90 12V30C90 55 80 82 50 98Z" className="fill-indigo-600" stroke="white" strokeWidth="2"/>
                       <path d="M50 98C20 82 10 55 10 30V12L50 2" className="fill-black/10" />
@@ -231,15 +234,15 @@ const Layout: React.FC<{
                    </svg>
                  </div>
                  <div className="hidden md:block">
-                   <h1 className="text-xl font-bold tracking-tight font-serif text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">THK</h1>
+                   <h1 className="text-2xl font-bold tracking-tight font-serif text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">THK</h1>
                  </div>
               </div>
             </div>
 
             {/* Center Section: Search Bar (Absolute Centered) */}
-            <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md justify-center z-20">
+            <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg justify-center z-20">
                <div className="relative w-full" ref={searchWrapperRef}>
-                 <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 w-full focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all shadow-sm">
+                 <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-2xl px-5 py-3 w-full focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all shadow-sm">
                   <Search className="w-5 h-5 text-slate-400 shrink-0" />
                   <input 
                     type="text" 
@@ -247,7 +250,7 @@ const Layout: React.FC<{
                     onChange={(e) => { setSearchQuery(e.target.value); setIsSearchFocused(true); }}
                     onFocus={() => setIsSearchFocused(true)}
                     placeholder={user.role === 'Admin' ? "Search courses, students, mentors..." : "Search courses..."}
-                    className="bg-transparent border-none outline-none text-sm ml-3 w-full text-slate-900 dark:text-white placeholder-slate-500"
+                    className="bg-transparent border-none outline-none text-base ml-3 w-full text-slate-900 dark:text-white placeholder-slate-500"
                   />
                 </div>
 
@@ -299,9 +302,9 @@ const Layout: React.FC<{
                 <div className="relative" ref={notificationWrapperRef}>
                   <button 
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl relative transition-colors"
+                    className="p-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl relative transition-colors"
                   >
-                    <Bell className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+                    <Bell className="w-7 h-7 text-slate-600 dark:text-slate-300" />
                     {unreadCount > 0 && (
                       <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
                     )}
@@ -353,7 +356,7 @@ const Layout: React.FC<{
                     <img 
                       src={user.avatar}
                       alt="Profile" 
-                      className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-700 shadow-sm object-cover"
+                      className="w-12 h-12 rounded-full border-2 border-white dark:border-slate-700 shadow-sm object-cover"
                     />
                   </button>
 
@@ -471,20 +474,6 @@ const Layout: React.FC<{
       
       {/* AI ChatBot Overlay */}
       <ChatBot />
-
-      {/* Global Course Details Modal */}
-      {globalCourse && (
-        <CourseDetails 
-          course={globalCourse} 
-          isOpen={!!globalCourse} 
-          onClose={() => setGlobalCourse(null)} 
-          onEnroll={(id) => {
-            onEnroll(id);
-            setGlobalCourse(null);
-          }}
-          isEnrolled={enrolledCourseIds.includes(globalCourse.id)}
-        />
-      )}
     </div>
   );
 };
@@ -496,6 +485,7 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('en');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   const handleLogin = (userData: any) => {
     setUser(userData);
@@ -520,7 +510,7 @@ const App: React.FC = () => {
   return (
     <RouterProvider>
       {isAuthenticated ? (
-        <Layout 
+        <LayoutWrapper 
           isAuthenticated={isAuthenticated}
           onLogout={handleLogout}
           user={user}
@@ -531,12 +521,26 @@ const App: React.FC = () => {
           setIsDarkMode={setIsDarkMode}
           enrolledCourseIds={enrolledCourseIds}
           onEnroll={handleEnroll}
+          selectedCourse={selectedCourse}
+          setSelectedCourse={setSelectedCourse}
         />
       ) : (
         <Auth onLogin={handleLogin} />
       )}
     </RouterProvider>
   );
+};
+
+// Helper wrapper to access router context
+const LayoutWrapper: React.FC<any> = (props) => {
+  const router = useRouter();
+  
+  const handleViewCourse = (course: Course) => {
+    props.setSelectedCourse(course);
+    router.push('/course-details');
+  };
+
+  return <Layout {...props} onViewCourse={handleViewCourse} />;
 };
 
 export default App;
